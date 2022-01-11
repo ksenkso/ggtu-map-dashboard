@@ -1,0 +1,24 @@
+$area-selected: #d9fff8
+
+.map-container
+  overflow: hidden
+  &[data-mode=paths]
+    circle.primitive
+      cursor: pointer
+  g
+    pointer-events: all
+    &[data-type]
+      &:hover
+        cursor: pointer
+      text
+        user-select: none
+
+  .target
+    &_selected
+      .area, [data-type="area"], .walls, [data-type=walls], &[data-type="transition-view"] *
+        fill: $area-selected
+
+.map-editor
+  &__action
+    &_underlined
+      border-bottom: 1px solid grey

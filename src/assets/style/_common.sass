@@ -1,0 +1,26 @@
+@import "~bootstrap/scss/functions"
+@import "~bootstrap/scss/variables"
+
+.form
+  &_centered
+    max-width: 800px
+    width: 100%
+
+.heading
+  &__btn
+    margin-left: 20px
+
+.ggtu-file-input
+  height: 2.6rem
+  position: relative
+  padding: 0
+  &::before
+    content: 'Открыть'
+    position: absolute
+    width: 100%
+    height: 100%
+    text-align: center
+    background-color: $primary
+    display: flex
+    align-items: center
+    justify-content: center
