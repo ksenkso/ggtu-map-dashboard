@@ -48,14 +48,15 @@
 </template>
 
 <script>
-  import Page from "../Page";
-  import {ApiClient, WayPath, Selection, Scene, Graph} from 'ggtu-map';
-  import {api} from '../../utils/api';
-  import PlaceForm from "./PlaceForm";
-  import UnlinkedPlacesList from "./UnlinkedPlacesList";
-  import TransitionViewForm from "./TransitionViewForm";
-  import BuildingForm from "./BuildingForm";
-  /**
+import Page from '../Page';
+import { Graph, Scene, Selection, WayPath } from 'ggtu-map';
+import { api } from '../../utils/api';
+import PlaceForm from './PlaceForm';
+import UnlinkedPlacesList from './UnlinkedPlacesList';
+import TransitionViewForm from './TransitionViewForm';
+import BuildingForm from './BuildingForm';
+
+/**
    * @type Scene
    */
   let scene;
@@ -116,15 +117,18 @@
        *
        * @type {HTMLElement}
        */
-      const container = this.$refs.mapContainer;
-      console.log(container);
-      scene = new Scene(container);
-      window.scene = scene;
+      scene = this.getSceneInstance()
+      window.scene = scene
       scene.on('mapChanged', this.initScene.bind(this));
-      console.log(this.location.map);
-
+      scene.setLocation(this.location)
     },
     methods: {
+      getSceneInstance() {
+        if (!scene) {
+          return new Scene(this.$refs.mapContainer)
+        }
+        return scene
+      },
       getBuildingId() {
         const container = this.getCurrentContainer();
         const target = scene.mapContainer.querySelector('#'+container.dataset.target);
@@ -138,7 +142,7 @@
         const graph = new Graph();
         scene.selection.reset();
         graph.appendTo(scene);
-        graph.showPath(path);
+        graph.showPath(path.vertices);
       },
       areTwoPointsSelected() {
         return scene && scene.selection.elements.length === 2;
@@ -281,19 +285,12 @@
             shouldUpload = confirm('Загрузить новую карту? Старая карта будет удалена с сохранением мест.');
           }
           if (shouldUpload) {
-            const axios = api.getTransport();
-            const fd = new FormData();
-            fd.append('map', file);
             try {
-              const response = await axios.patch(ApiClient.apiBase + '/locations/' + this.location.id + '/upload', fd);
-              if (response.status === 200) {
-                this.location.map = response.data.map;
-                scene.refresh();
-              } else {
-                alert('Ошибка загрузки карты');
-                console.log(response);
-              }
-
+              await api.locations.uploadMap(this.location.id, file)
+              scene.refresh()
+                .then(() => {
+                  this.location.map = scene.getLocation().map
+                })
             } catch (e) {
               alert('Ошибка загрузки карты');
               console.error(e);
@@ -303,6 +300,7 @@
       },
       updateLocation(location) {
         this.location = location;
+        scene = this.getSceneInstance()
         try {
           scene.setLocation(location)
             .then(() => {
@@ -334,8 +332,8 @@
       savePaths() {
         const diff = WayPath.diff(graph, editableGraph);
         console.log(diff);
-        api.getTransport()
-          .put(ApiClient.apiBase + '/locations/' + this.location.id + '/paths', diff)
+        api.locations
+          .updatePaths(this.location.id, diff)
           .then(res => {
             console.log(res);
           })
