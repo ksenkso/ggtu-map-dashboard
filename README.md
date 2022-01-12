@@ -7,7 +7,7 @@ This repo is no longer mainteined
 An admin panel for GGTU Maps.
 
 Related repos:
-- [Admin panel repo](https://github.com/ksenkso/ggtu-maps-admin)
+- [API Server](https://github.com/ksenkso/ggtu-map-api)
 - [Map library (API client and renderer)](https://github.com/ksenkso/ggtu-map)
 - [Map client](https://github.com/ksenkso/ggtu-map-client)
 - [Map transformation tool](https://github.com/ksenkso/ggtu-map-tool)
